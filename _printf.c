@@ -62,6 +62,11 @@ int print_format(PrintfContext *ctx)
 		if (*(ctx->format) == '%')
 		{
 			ctx->format++;
+			if (*(ctx->format) == '\0')
+			{
+				print_char(ctx, '%');
+				break;
+			}
 			switch (*(ctx->format))
 			{
 				case 'c':
