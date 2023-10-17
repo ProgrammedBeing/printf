@@ -1,54 +1,110 @@
 #include "main.h"
-
-int _printf(const char *format, ...)
+/**
+ * print_char - Function for printing characters
+ * @ctx: Pointer
+ * @c: Character
+ *
+ * Return: 1
+ */
+int print_char(PrintfContext *ctx, char c)
 {
-	char *str;
-	unsigned int count = 0;
-	va_list args;
-	va_start(args, format);
+	_putchar(c);
+	ctx->count++;
+	return (1);
+}
 
-	while (*format)
+/**
+ * print_string - Print strings
+ *
+ * @ctx: Struct pointer
+ * @str: String.
+ *
+ * Return: Count
+ */
+int print_string(PrintfContext *ctx, const char *str)
+{
+	int len = 0;
+	const char *s;
+
+	for (s = str; *s; s++)
 	{
-		if (*format == '%' && *(format + 1) != '\0')
+		_putchar(*s);
+		len++;
+	}
+	ctx->count += len;
+	return (len);
+}
+
+/**
+ * print_percent - Function for printing %
+ * @ctx: Structure pointer
+ *
+ * Return: Return 1
+ */
+
+int print_percent(PrintfContext *ctx)
+{
+	_putchar('%');
+	ctx->count++;
+	return (1);
+}
+
+/**
+ * print_format - main print format function
+ * @ctx: Pointer to a structure.
+ *
+ * Return: count
+ */
+int print_format(PrintfContext *ctx)
+{
+	while (*(ctx->format))
+	{
+		if (*(ctx->format) == '%')
 		{
-			format++; /* Move past the '%' */
-			switch(*format)
+			ctx->format++;
+			switch (*(ctx->format))
 			{
 				case 'c':
-					_putchar(va_arg(args, int));
-					count++;
+					print_char(ctx, va_arg(ctx->args, int));
 					break;
 				case 's':
-					{
-						str = va_arg(args, char *);
-						while (*str)
-						{
-							_putchar(*str);
-							str++;
-							count++;
-						}
-					}
+					print_string(ctx, va_arg(ctx->args, const char *));
 					break;
 				case '%':
-					_putchar('%');
-					count++;
+					print_percent(ctx);
 					break;
 				default:
-					_putchar('%');
-					_putchar(*format);
-					count += 2;
+					print_percent(ctx);
+					print_char(ctx, *(ctx->format));
 					break;
 			}
 		}
 		else
-		{
-			_putchar(*format);
-			count++;
-		}
-		format++;
+			print_char(ctx, *(ctx->format));
+		ctx->format++;
 	}
+	return (ctx->count);
+}
 
-	va_end(args);
+/**
+ * _printf - Similar too printf function
+ * @format: a variable
+ *
+ * Return: length.
+ */
+int _printf(const char *format, ...)
+{
+	int result;
 
-	return (count);
+	PrintfContext ctx;
+
+	ctx.format = format;
+	va_start(ctx.args, format);
+	ctx.count = 0;
+
+	result = print_format(&ctx);
+
+	va_end(ctx.args);
+
+	return (result);
 }
